@@ -1,0 +1,1842 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NBench</name>
+    </assembly>
+    <members>
+        <member name="T:NBench.BenchmarkContext">
+            <summary>
+            Contains the runtime context for a given benchmark run.
+            
+            Makes it possible for developers to access built-in <see cref="T:NBench.Counter"/>s declared
+            via the <see cref="T:NBench.CounterMeasurementAttribute"/>, <see cref="T:NBench.CounterThroughputAssertionAttribute"/>, 
+            and <see cref="T:NBench.CounterTotalAssertionAttribute"/> classes.
+            </summary>
+        </member>
+        <member name="F:NBench.BenchmarkContext.Empty">
+            <summary>
+            Empty context - used for unit testing.
+            </summary>
+        </member>
+        <member name="M:NBench.BenchmarkContext.GetCounter(System.String)">
+            <summary>
+            Retrieves a named <see cref="T:NBench.Counter"/> instance that has already been registered via a <see cref="T:NBench.CounterMeasurementAttribute"/>, 
+            <see cref="T:NBench.CounterThroughputAssertionAttribute"/>, or <see cref="T:NBench.CounterTotalAssertionAttribute"/> classes.
+            </summary>
+            <param name="name">The name of the counter.</param>
+            <returns>The corresponding <see cref="T:NBench.Counter"/> instance.</returns>
+        </member>
+        <member name="M:NBench.BenchmarkContext.CounterExists(System.String)">
+            <summary>
+            Determines if a counter with a particular name has been registered or not.
+            </summary>
+            <param name="name">The name of the counter.</param>
+            <returns><c>true</c> if it's been registered, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="P:NBench.BenchmarkContext.CounterNames">
+            <summary>
+            The names of all available counters
+            </summary>
+        </member>
+        <member name="P:NBench.BenchmarkContext.Counters">
+            <summary>
+            All available counters
+            </summary>
+        </member>
+        <member name="P:NBench.BenchmarkContext.Trace">
+            <summary>
+            Allows NBench users to write custom messages directly into the NBench output.
+            </summary>
+        </member>
+        <member name="T:NBench.ByteConstants">
+            <summary>
+            Handy class for being able to use pre-calculated constant values for computing byte sizes
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.Counters.CounterMetricCollector">
+            <summary>
+                A simple concurrent counter used for user-defined metrics
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.Counters.CounterSelector">
+            <summary>
+            <see cref="T:NBench.Collection.MetricsCollectorSelector"/> used for creating named <see cref="T:NBench.Collection.Counters.CounterMetricCollector"/> instances.
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.GarbageCollection.GcCollectionsPerGenerationCollector">
+            <summary>
+                Returns the number of times <see cref="T:System.GC" /> has collected <see cref="P:NBench.Collection.GarbageCollection.GcCollectionsPerGenerationCollector.Generation" />.
+            </summary>
+        </member>
+        <member name="P:NBench.Collection.GarbageCollection.GcCollectionsPerGenerationCollector.Generation">
+            <summary>
+                Refers to the number of the GC generation we're monitoring
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.GarbageCollection.GcCollectionsSelector">
+            <summary>
+                Responsible for creating <see cref="T:NBench.Collection.MetricCollector" />s for monitoring GC metrics
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.Memory.GcTotalMemoryCollector">
+            <summary>
+                Measures the total amount of allocated memory that occurs during a performance test run.
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.Memory.TotalMemorySelector">
+            <summary>
+            Allocator responsible for choosing the appropriate memory collector implementation,
+            depending on user settings and <see cref="T:NBench.Sys.SysInfo"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.MetricCollector">
+            <summary>
+            Responsible for collecting metrics for various things inside NBench
+            </summary>
+        </member>
+        <member name="P:NBench.Collection.MetricCollector.Name">
+            <summary>
+            The name of this metric
+            </summary>
+        </member>
+        <member name="P:NBench.Collection.MetricCollector.UnitName">
+            <summary>
+            The unit this metric is measured by
+            </summary>
+        </member>
+        <member name="M:NBench.Collection.MetricCollector.Collect">
+            <summary>
+            Collects the value of this metric
+            </summary>
+        </member>
+        <member name="M:NBench.Collection.MetricCollector.DisposeInternal">
+            <summary>
+            Internal method for disposing any resources used by a specific <see cref="T:NBench.Collection.MetricCollector"/>
+            implementation.
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.MetricNames">
+            <summary>
+            Holds all of the constant metric names used for built-in metrics
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.TotalMemoryAllocated">
+            <summary>
+            Used when measuring total memory (in bytes) allocated across a benchmark
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.MemoryAllocatedUnits">
+            <summary>
+            The unit of measure for memory allocations
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.GcCollections">
+            <summary>
+            Used when calculating garbage collections per generation
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.GcCollectionsUnits">
+            <summary>
+            Unit of measure for garbage collections
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.CustomCounter">
+            <summary>
+            Prefix used for custom counters
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.CounterUnits">
+            <summary>
+            Name of the unit measured by counters
+            </summary>
+        </member>
+        <member name="F:NBench.Collection.MetricNames.DefaultUnitName">
+            <summary>
+            The default unit name when none are specified
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.MetricsCollectorSelector">
+            <summary>
+                Strategy pattern that's used to determine how to pick the appropriate
+                <see cref="T:NBench.Collection.MetricCollector" /> based on platform dependencies and user-preferences.
+            </summary>
+        </member>
+        <member name="P:NBench.Collection.MetricsCollectorSelector.Name">
+            <summary>
+                The name of the underlying <see cref="T:NBench.Collection.MetricCollector" />. Will
+                be used in the counter regardless of the implementation selected.
+            </summary>
+        </member>
+        <member name="P:NBench.Collection.MetricsCollectorSelector.SystemInfo">
+            <summary>
+                Information about the current runtime - used in the course of making
+                decisions about tool selection and management
+            </summary>
+        </member>
+        <member name="M:NBench.Collection.MetricsCollectorSelector.Create(NBench.RunMode,NBench.Sdk.IBenchmarkSetting)">
+            <summary>
+                Creates an instance for all applicable <see cref="T:NBench.Collection.MetricCollector" />s for this metric type.
+            </summary>
+            <param name="runMode">
+                The <see cref="T:NBench.RunMode" /> for this benchmark. Influences the type of
+                <see cref="T:NBench.Collection.MetricCollector" /> used in some instances.
+            </param>
+            <param name="setting">An implementation-specific <see cref="T:NBench.Sdk.IBenchmarkSetting" /></param>
+            <returns>A new <see cref="T:NBench.Collection.MetricCollector" /> instance. </returns>
+        </member>
+        <member name="M:NBench.Collection.MetricsCollectorSelector.Create(NBench.RunMode,NBench.Sdk.WarmupData,NBench.Sdk.IBenchmarkSetting)">
+            <summary>
+                Creates an instance for all applicable <see cref="T:NBench.Collection.MetricCollector" />s for this metric type.
+            </summary>
+            <param name="runMode">
+                The <see cref="T:NBench.RunMode" /> for this benchmark. Influences the type of
+                <see cref="T:NBench.Collection.MetricCollector" /> used in some instances.
+            </param>
+            <param name="warmup">Warmup data. Influences the type of <see cref="T:NBench.Collection.MetricCollector" /> used in some instances.</param>
+            <param name="setting">An implementation-specific <see cref="T:NBench.Sdk.IBenchmarkSetting" /></param>
+            <returns>A new <see cref="T:NBench.Collection.MetricCollector" /> instance.</returns>
+        </member>
+        <member name="M:NBench.Collection.Timing.TimingCollector.Collect">
+            <summary>
+            Returns the current time back as milliseconds
+            </summary>
+        </member>
+        <member name="T:NBench.Collection.Timing.TimingSelector">
+            <summary>
+            <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation for <see cref="T:NBench.TimingMeasurementAttribute"/> 
+            and <see cref="T:NBench.ElapsedTimeAssertionAttribute"/>
+            </summary>
+        </member>
+        <member name="T:NBench.NBenchCommands">
+            <summary>
+            Command line argument parser for NBench specifications
+            
+            Parses arguments from <see cref="M:System.Environment.GetCommandLineArgs"/>.
+            
+            For example (from the Akka.NodeTestRunner source):
+            <code>
+                var outputDirectory = CommandLine.GetInt32("output-directory");
+            </code>
+            </summary>
+        </member>
+        <member name="M:NBench.NBenchCommands.HasProperty(System.String)">
+            <summary>
+            Determines whether a property was written in the command line
+            </summary>
+            <param name="key">Name of the property</param>
+            <returns></returns>
+        </member>
+        <member name="T:NBench.Counter">
+            <summary>
+            A high-performance, thread-safe counter class used to measure throughput on user-defined metrics
+            </summary>
+        </member>
+        <member name="M:NBench.Counter.Increment">
+            <summary>
+            Increment the value of the counter by 1
+            </summary>
+        </member>
+        <member name="M:NBench.Counter.Increment(System.Int64)">
+            <summary>
+            Increment the counter by a user-defined amount.
+            </summary>
+            <param name="v">The counter increment value.</param>
+        </member>
+        <member name="M:NBench.Counter.Decrement">
+            <summary>
+            Decrement the value of the counter by 1
+            </summary>
+        </member>
+        <member name="M:NBench.Counter.Decrement(System.Int64)">
+            <summary>
+            Decrement the counter by a user-defined amount.
+            </summary>
+            <param name="v">The counter decrement value.</param>
+        </member>
+        <member name="P:NBench.Counter.Current">
+            <summary>
+            Current value of the counter
+            </summary>
+        </member>
+        <member name="T:NBench.CounterMeasurementAttribute">
+            <summary>
+            Creates a custom <see cref="T:NBench.Counter"/> to be used for tracking app-specific metrics
+            in combination with a <see cref="T:NBench.PerfBenchmarkAttribute"/>
+            </summary>
+        </member>
+        <member name="P:NBench.CounterMeasurementAttribute.CounterName">
+            <summary>
+            The name of the <see cref="T:NBench.Counter"/> being measured
+            </summary>
+        </member>
+        <member name="T:NBench.CounterThroughputAssertionAttribute">
+            <summary>
+            Performs an assertion against counters collected over the course of a benchmark.
+            
+            This asserts the NUMBER OF OPERATIONS / SECOND values averaged over all runs of a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterThroughputAssertionAttribute.Condition">
+            <summary>
+            The test we're going to perform against the collected value of <see cref="P:NBench.CounterMeasurementAttribute.CounterName"/>
+            and <see cref="P:NBench.CounterThroughputAssertionAttribute.AverageOperationsPerSecond"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterThroughputAssertionAttribute.AverageOperationsPerSecond">
+            <summary>
+            The value that will be compared against the collected metric for <see cref="P:NBench.CounterMeasurementAttribute.CounterName"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterThroughputAssertionAttribute.MaxAverageOperationsPerSecond">
+            <summary>
+            Used only on <see cref="F:NBench.MustBe.Between"/> comparisons. This is the upper bound of that comparison
+            and <see cref="P:NBench.CounterThroughputAssertionAttribute.AverageOperationsPerSecond"/> is the lower bound.
+            </summary>
+        </member>
+        <member name="T:NBench.CounterTotalAssertionAttribute">
+            <summary>
+            Performs an assertion against counters collected over the course of a benchmark.
+            
+            This asserts the TOTAL AVERAGE NUMBER OF OPERATIONS values averaged over all runs of a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterTotalAssertionAttribute.Condition">
+            <summary>
+            The test we're going to perform against the collected value of <see cref="P:NBench.CounterMeasurementAttribute.CounterName"/>
+            and <see cref="P:NBench.CounterTotalAssertionAttribute.AverageOperationsTotal"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterTotalAssertionAttribute.AverageOperationsTotal">
+            <summary>
+            The value that will be compared against the collected metric for <see cref="P:NBench.CounterMeasurementAttribute.CounterName"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.CounterTotalAssertionAttribute.MaxAverageOperationsTotal">
+            <summary>
+            Used only on <see cref="F:NBench.MustBe.Between"/> comparisons. This is the upper bound of that comparison
+            and <see cref="P:NBench.CounterTotalAssertionAttribute.AverageOperationsTotal"/> is the lower bound.
+            </summary>
+        </member>
+        <member name="T:NBench.GcGeneration">
+            <summary>
+            Specifies the CLR Garbage Collection generation to track during a <see cref="T:NBench.PerfBenchmarkAttribute"/>
+            </summary>
+        </member>
+        <member name="T:NBench.GcMetric">
+            <summary>
+            Specifies the CLR garbage collection metric we want to track, usually in combination with a <see cref="T:NBench.GcGeneration"/>.
+            </summary>
+        </member>
+        <member name="F:NBench.GcMetric.TotalCollections">
+            <summary>
+            Total number of per-<see cref="T:NBench.GcGeneration"/> collections
+            </summary>
+        </member>
+        <member name="T:NBench.GcMeasurementAttribute">
+            <summary>
+            Issues a command to NBench to monitor system GC metrics that occur during the <see cref="T:NBench.PerfBenchmarkAttribute"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.GcMeasurementAttribute.Metric">
+            <summary>
+            The GC metric we're going to collect during the benchmark
+            </summary>
+        </member>
+        <member name="P:NBench.GcMeasurementAttribute.Generation">
+            <summary>
+            The GC generation for which we'll observe <see cref="P:NBench.GcMeasurementAttribute.Metric"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.GcThroughputAssertionAttribute">
+            <summary>
+            Performs an assertion against counters collected over the course of a benchmark.
+            
+            This asserts the NUMBER OF OPERATIONS / SECOND values averaged over all runs of a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.GcThroughputAssertionAttribute.Condition">
+            <summary>
+            The test we're going to perform against the collected value of <see cref="P:NBench.GcMeasurementAttribute.Metric"/>
+            and <see cref="P:NBench.GcThroughputAssertionAttribute.AverageOperationsPerSecond"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.GcThroughputAssertionAttribute.AverageOperationsPerSecond">
+            <summary>
+            The value that will be compared against the collected metric for <see cref="P:NBench.GcMeasurementAttribute.Metric"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.GcThroughputAssertionAttribute.MaxAverageOperationsPerSecond">
+            <summary>
+            Used only on <see cref="F:NBench.MustBe.Between"/> comparisons. This is the upper bound of that comparison
+            and <see cref="P:NBench.GcThroughputAssertionAttribute.AverageOperationsPerSecond"/> is the lower bound.
+            </summary>
+        </member>
+        <member name="T:NBench.GcTotalAssertionAttribute">
+            <summary>
+            Performs an assertion against counters collected over the course of a benchmark.
+            
+            This asserts the TOTAL AVERAGE NUMBER OF OPERATIONS values averaged over all runs of a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.GcTotalAssertionAttribute.Condition">
+            <summary>
+            The test we're going to perform against the collected value of <see cref="P:NBench.GcMeasurementAttribute.Metric"/>
+            and <see cref="P:NBench.GcTotalAssertionAttribute.AverageOperationsTotal"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.GcTotalAssertionAttribute.AverageOperationsTotal">
+            <summary>
+            The value that will be compared against the collected metric for <see cref="P:NBench.GcMeasurementAttribute.Metric"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.GcTotalAssertionAttribute.MaxAverageOperationsTotal">
+            <summary>
+            Used only on <see cref="F:NBench.MustBe.Between"/> comparisons. This is the upper bound of that comparison
+            and <see cref="P:NBench.GcTotalAssertionAttribute.AverageOperationsTotal"/> is the lower bound.
+            </summary>
+        </member>
+        <member name="T:NBench.IBenchmarkTrace">
+            <summary>
+            Exposed to the end-user by <see cref="T:NBench.BenchmarkContext"/> so they can add
+            diagnostic messages to the output of a benchmark.
+            </summary>
+        </member>
+        <member name="M:NBench.IBenchmarkTrace.Debug(System.String)">
+            <summary>
+            Write a debug event to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.IBenchmarkTrace.Info(System.String)">
+            <summary>
+            Write a info event to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.IBenchmarkTrace.Warning(System.String)">
+            <summary>
+            Write a warning to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.IBenchmarkTrace.Error(System.Exception,System.String)">
+            <summary>
+            Write an error to the NBench output
+            </summary>
+            <param name="ex">The <see cref="T:System.Exception"/> raised during the benchmark.</param>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.IBenchmarkTrace.Error(System.String)">
+            <summary>
+            Write an error to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="T:NBench.MeasurementAttribute">
+            <summary>
+            Abstract base class used by all Measurements in NBench
+            </summary>
+        </member>
+        <member name="T:NBench.MemoryMetric">
+            <summary>
+                Available memory-related metrics that can be profiled and tested against
+            </summary>
+        </member>
+        <member name="F:NBench.MemoryMetric.TotalBytesAllocated">
+            <summary>
+                Measure the total bytes allocated during a benchmark
+            </summary>
+        </member>
+        <member name="T:NBench.MemoryMeasurementAttribute">
+            <summary>
+                Issues a command to NBench to monitor various memory metrics allocated
+                during the <see cref="T:NBench.PerfBenchmarkAttribute" />
+            </summary>
+        </member>
+        <member name="P:NBench.MemoryMeasurementAttribute.Metric">
+            <summary>
+                The memory-specific metric we're going to track.
+            </summary>
+        </member>
+        <member name="T:NBench.MemoryAssertionAttribute">
+            <summary>
+                Performs an assertion against memory counters collected over the course of a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.MemoryAssertionAttribute.Condition">
+            <summary>
+                The test we're going to perform against the collected value of <see cref="T:NBench.MemoryMetric" />
+                and <see cref="P:NBench.MemoryAssertionAttribute.AverageBytes" />.
+            </summary>
+        </member>
+        <member name="P:NBench.MemoryAssertionAttribute.AverageBytes">
+            <summary>
+                The value that will be compared against the collected metric for <see cref="T:NBench.MemoryMetric" />.
+            </summary>
+        </member>
+        <member name="P:NBench.MemoryAssertionAttribute.MaxAverageBytes">
+            <summary>
+                Used only on <see cref="F:NBench.MustBe.Between" /> comparisons. This is the upper bound of that comparison
+                and <see cref="P:NBench.MemoryAssertionAttribute.AverageBytes" /> is the lower bound.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.BenchmarkRun">
+            <summary>
+                Used to collect metrics for a given instance of a benchmark
+            </summary>
+        </member>
+        <member name="P:NBench.Metrics.BenchmarkRun.IsFaulted">
+            <summary>
+            Returns <c>true</c> if any <see cref="T:System.Exception"/>s were thrown during this run.
+            </summary>
+        </member>
+        <member name="M:NBench.Metrics.BenchmarkRun.Sample(System.Int64)">
+            <summary>
+                Sample all actively used benchmarks in this run
+            </summary>
+        </member>
+        <member name="M:NBench.Metrics.BenchmarkRun.WithException(System.Exception)">
+            <summary>
+            Adds an <see cref="T:System.Exception"/> to this <see cref="T:NBench.Metrics.BenchmarkRun"/>.
+            </summary>
+            <param name="ex">The <see cref="T:System.Exception"/> thrown while running the benchmark.</param>
+        </member>
+        <member name="M:NBench.Metrics.BenchmarkRun.ToReport(System.TimeSpan)">
+            <summary>
+            Collect a final report for this <see cref="T:NBench.Metrics.BenchmarkRun"/>
+            </summary>
+            <returns>A compiled report for all of the underlying <see cref="T:NBench.Metrics.MeasureBucket"/>s.</returns>
+        </member>
+        <member name="T:NBench.Metrics.Counters.CounterBenchmarkSetting">
+            <summary>
+            Used inside a <see cref="T:NBench.Sdk.BenchmarkSettings"/> class to indiciate that a specific <see cref="T:NBench.Counter"/>
+            needs to be recorded and tested against <see cref="P:NBench.Metrics.Counters.CounterBenchmarkSetting.Assertion"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.Counters.CreateCounterBenchmarkSetting">
+            <summary>
+            Special internal class needed to pass in a <see cref="T:NBench.Util.AtomicCounter"/> to a <see cref="T:NBench.Collection.Counters.CounterSelector"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.GarbageCollection.GcBenchmarkSetting">
+            <summary>
+            Used inside a <see cref="T:NBench.Sdk.BenchmarkSettings"/> class to indiciate that a specific <see cref="T:NBench.GcMetric"/>
+            for a <see cref="T:NBench.GcGeneration"/> needs to be recorded and tested against <see cref="P:NBench.Metrics.GarbageCollection.GcBenchmarkSetting.Assertion"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.MeasureBucket">
+            <summary>
+            A metric that's collected over the course of a test run using
+            a stack of values sampled over time, the deltas of which will later be calculated.
+            </summary>
+        </member>
+        <member name="P:NBench.Metrics.MeasureBucket.Name">
+            <summary>
+            Name of the metric
+            </summary>
+        </member>
+        <member name="P:NBench.Metrics.MeasureBucket.Unit">
+            <summary>
+            Name of the unit
+            </summary>
+        </member>
+        <member name="M:NBench.Metrics.MeasureBucket.ToReport">
+            <summary>
+            Converts the data collected within this <see cref="T:NBench.Metrics.MeasureBucket"/>
+            into a <see cref="T:NBench.Reporting.MetricRunReport"/>.
+            </summary>
+            <returns>A metric run report containing all of the delta for this measure bucket.</returns>
+        </member>
+        <member name="T:NBench.Metrics.Memory.MemoryBenchmarkSetting">
+            <summary>
+            Used inside a <see cref="T:NBench.Sdk.BenchmarkSettings"/> class to indiciate that a specific <see cref="T:NBench.MemoryMetric"/>
+            needs to be recorded and tested against <see cref="P:NBench.Metrics.Memory.MemoryBenchmarkSetting.Assertion"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.Memory.MemoryMetricName">
+            <summary>
+            Name for memory metrics
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.MetricMeasurement">
+            <summary>
+            A single recorded value inside a <see cref="T:NBench.Metrics.MeasureBucket"/>
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.MetricName">
+            <summary>
+            Used to uniquely represent the name of a metric in a manner-agnostic way.
+            </summary>
+        </member>
+        <member name="M:NBench.Metrics.MetricName.ToHumanFriendlyString">
+            <summary>
+            Print the <see cref="T:NBench.Metrics.MetricName"/> in a human-friendly manner that will be
+            used in subsequent reports.
+            </summary>
+            <returns>a human-optimized string</returns>
+        </member>
+        <member name="T:NBench.Metrics.Timing.TimingBenchmarkSetting">
+            <summary>
+            <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation for <see cref="T:NBench.TimingMeasurementAttribute"/>
+            and other derived versions.
+            </summary>
+        </member>
+        <member name="T:NBench.Metrics.Timing.TimingMetricName">
+            <summary>
+            <see cref="T:NBench.Metrics.MetricName"/> used for <see cref="T:NBench.ElapsedTimeAssertionAttribute"/> and <see cref="T:NBench.TimingMeasurementAttribute"/>.
+            </summary>
+        </member>
+        <member name="T:NBench.MustBe">
+            <summary>
+            Comparison and test types used by NBench for performing performance test BenchmarkAssertions
+            </summary>
+        </member>
+        <member name="T:NBench.NBenchException">
+            <summary>
+            Exceptions thrown by NBench
+            </summary>
+        </member>
+        <member name="M:NBench.NBenchRunner.PrintHelp">
+            <summary>
+            Prints help messages to the console.
+            </summary>
+        </member>
+        <member name="T:NBench.TestMode">
+            <summary>
+            Specifies the way we want to run a particular performance test
+            </summary>
+        </member>
+        <member name="F:NBench.TestMode.Test">
+            <summary>
+            Requires at least one performance assertion and throws a 
+            PASS / FAIL result into the log.
+            </summary>
+        </member>
+        <member name="F:NBench.TestMode.Measurement">
+            <summary>
+            Performs no BenchmarkAssertions - just records the metrics and writes them to the log
+            </summary>
+        </member>
+        <member name="F:NBench.RunMode.Iterations">
+            <summary>
+            Run a fixed number of iterations of a benchmark.
+            
+            Best for long-running benchmarks that need to measure things like memory, GC
+            </summary>
+        </member>
+        <member name="F:NBench.RunMode.Throughput">
+            <summary>
+            Run a benchmark for a specified duration.
+            
+            Best for small benchmarks designed to measure throughput - i.e. Operations per Second
+            </summary>
+        </member>
+        <member name="T:NBench.PerfBenchmarkAttribute">
+            <summary>
+            Marks a method on a class as being an NBench performance test
+            </summary>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.NumberOfIterations">
+            <summary>
+            Number of times this test will be run
+            </summary>
+            <remarks>Defaults to 10</remarks>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.RunTimeMilliseconds">
+            <summary>
+            For <see cref="F:NBench.RunMode.Throughput"/> tests, this determines
+            the maximum amount of clock-time in milliseconds this benchmark will run.
+            
+            For all other modes, this sets the timeout at which point the test will be failed.
+            
+            Disabled by default in any tests using any mode other than <see cref="F:NBench.RunMode.Throughput"/>.
+            Defaults to 1000ms in <see cref="F:NBench.RunMode.Throughput"/>.
+            </summary>
+            <remarks>Set to 0 to disable.</remarks>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.TestMode">
+            <summary>
+            The mode in which this performance data will be tested.
+            
+            Defaults to <see cref="F:NBench.TestMode.Measurement"/>
+            </summary>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.RunMode">
+            <summary>
+            The mode in which this performance data will be collected.
+            
+            Defaults to <see cref="F:NBench.RunMode.Iterations"/>
+            </summary>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.Description">
+            <summary>
+            A description of this performance benchmark, which will be written into the report.
+            </summary>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.Skip">
+            <summary>
+            If populated, this benchmark will be skipped and the skip reason will be written into the report.
+            </summary>
+        </member>
+        <member name="P:NBench.PerfBenchmarkAttribute.SkipWarmups">
+            <summary>
+            Skips warmups (aside from the pre-warmup) entirely
+            </summary>
+        </member>
+        <member name="T:NBench.PerfSetupAttribute">
+            <summary>
+            Performs a setup operation before the <see cref="T:NBench.PerfBenchmarkAttribute"/> gets run.
+            </summary>
+        </member>
+        <member name="T:NBench.PerfCleanupAttribute">
+            <summary>
+            Performs a cleanup operation after the <see cref="T:NBench.PerfBenchmarkAttribute"/> gets run.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.AggregateMetrics">
+            <summary>
+            Aggregated metrics accumulated for a single metric across an entire <see cref="T:NBench.Sdk.Benchmark"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.AggregateMetrics.Name">
+            <summary>
+            The name of the metric
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.AggregateMetrics.Unit">
+            <summary>
+            The unit of measure for the metric
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.BenchmarkFinalResults">
+            <summary>
+            <see cref="T:NBench.Reporting.BenchmarkResults"/> with <see cref="T:NBench.Sdk.Assertion"/> data provided.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.BenchmarkResults">
+            <summary>
+                The cumulative results for an entire <see cref="T:NBench.Sdk.Benchmark" />
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.BenchmarkName">
+            <summary>
+            Usually prints out the type name of the spec being run
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.Settings">
+            <summary>
+                The settings for this <see cref="T:NBench.Sdk.Benchmark" />
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.Exceptions">
+            <summary>
+            The set of <see cref="T:System.Exception"/>s that may have occurred during a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.IsFaulted">
+            <summary>
+            Returns <c>true</c> if any <see cref="T:System.Exception"/>s were thrown during this run.
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.Runs">
+            <summary>
+            The list of raw data available for each run of the benchmark
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkResults.StatsByMetric">
+            <summary>
+                Per-metric aggregate statistics
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.BenchmarkRunReport">
+            <summary>
+                Compiled statistics for each <see cref="T:NBench.Metrics.BenchmarkRun" />
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkRunReport.Elapsed">
+            <summary>
+                Total amount of elapsed time on this run
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkRunReport.Metrics">
+            <summary>
+                Key value pair of all metrics, where the key corresponds to the name of the metric
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkRunReport.Exceptions">
+            <summary>
+            The set of <see cref="T:System.Exception"/>s that may have occurred during a benchmark.
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.BenchmarkRunReport.IsFaulted">
+            <summary>
+            Returns <c>true</c> if any <see cref="T:System.Exception"/>s were thrown during this run.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.BenchmarkStat">
+            <summary>
+            Represents aggregate statics for a benchmark across multiple runs
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.CompositeBenchmarkOutput">
+            <summary>
+            Composition of multiple <see cref="T:NBench.Reporting.IBenchmarkOutput"/> instances being run in parallel.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.IBenchmarkOutput">
+            <summary>
+                Interface used to write <see cref="T:NBench.Reporting.BenchmarkRunReport" /> and <see cref="T:NBench.Reporting.BenchmarkResults" />
+                out to various reporting mechansims, including file-based and console-based ones.
+            </summary>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.WriteLine(System.String)">
+            <summary>
+            Write a line to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.Warning(System.String)">
+            <summary>
+            Write a warning to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.Error(System.Exception,System.String)">
+            <summary>
+            Write an error to the NBench output
+            </summary>
+            <param name="ex">The <see cref="T:System.Exception"/> raised during the benchmark.</param>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.Error(System.String)">
+            <summary>
+            Write an error to the NBench output
+            </summary>
+            <param name="message">The message we're going to write to output.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.StartBenchmark(System.String)">
+            <summary>
+            Signal that we're going to begin a new benchmark
+            </summary>
+            <param name="benchmarkName">The name of the benchmark.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.SkipBenchmark(System.String)">
+            <summary>
+            Signal that we're going to be skipping a benchmark
+            </summary>
+            <param name="benchmarkName">The name of the benchmark.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.FinishBenchmark(System.String)">
+            <summary>
+            Signals that we've completed processing a benchmark, regardless
+            of how it finished.
+            </summary>
+            <param name="benchmarkName">The name of the benchmark.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.WriteRun(NBench.Reporting.BenchmarkRunReport,System.Boolean)">
+            <summary>
+                Write out an individual run to the console or file
+            </summary>
+            <param name="report">The report for an individual <see cref="T:NBench.Metrics.BenchmarkRun" /></param>
+            <param name="isWarmup">If <c>true</c>, the output writer will signal that this data is for a warm-up run.</param>
+        </member>
+        <member name="M:NBench.Reporting.IBenchmarkOutput.WriteBenchmark(NBench.Reporting.BenchmarkFinalResults)">
+            <summary>
+                Write out the entire benchmark result set to the console or file
+            </summary>
+            <param name="results">
+                The report for all <see cref="T:NBench.Metrics.BenchmarkRun" />s in a <see cref="T:NBench.Sdk.Benchmark" />, including
+                <see cref="T:NBench.Sdk.Assertion" /> results.
+            </param>
+        </member>
+        <member name="T:NBench.Reporting.MetricRunReport">
+            <summary>
+            All of the compiled values from one <see cref="T:NBench.Metrics.BenchmarkRun"/> for a given <see cref="T:NBench.Metrics.MeasureBucket"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.MetricRunReport.Name">
+            <summary>
+            The name of the metric
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.MetricRunReport.Unit">
+            <summary>
+            The unit of measure for the metric
+            </summary>
+        </member>
+        <member name="P:NBench.Reporting.MetricRunReport.MetricValue">
+            <summary>
+            The raw values of the <see cref="T:NBench.Metrics.MeasureBucket"/>
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.NoOpBenchmarkOutput">
+            <summary>
+            <see cref="T:NBench.Reporting.IBenchmarkOutput"/> implementation that doesn't do anything
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.Targets.ActionBenchmarkOutput">
+            <summary>
+            An <see cref="T:NBench.Reporting.IBenchmarkOutput"/> designed to run BenchmarkAssertions against the data we collect on each run and in the final benchmark.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.Targets.ConsoleBenchmarkOutput">
+            <summary>
+            Output writer to the console for NBench
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.Targets.MarkdownBenchmarkOutput">
+            <summary>
+                <see cref="T:NBench.Reporting.IBenchmarkOutput" /> implementation that writes output for each
+                completed benchmark to a markdown file. Uses <see cref="T:NBench.Util.FileNameGenerator" />
+                to generate a file name unique to each test AND the time it was run.
+            </summary>
+        </member>
+        <member name="T:NBench.Reporting.TeamCityBenchmarkOutput">
+            <summary>
+            TeamCity output formatter.
+            
+            Complies with https://confluence.jetbrains.com/display/TCD10/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingTests
+            to ensure that output reports from NBench render nicely on TeamCity.
+            </summary>
+            <remarks>
+            Can be enabled in the default NBench test runner by passing in the <code>teamcity=true</code> flag.
+            </remarks>
+        </member>
+        <member name="M:NBench.Reporting.TeamCityBenchmarkOutput.#ctor(System.IO.TextWriter)">
+            <summary>
+            Constructor that takes a <see cref="T:System.IO.TextWriter"/> to use
+            as the output target.
+            </summary>
+            <param name="writer">Output target.</param>
+        </member>
+        <member name="M:NBench.Reporting.TeamCityBenchmarkOutput.#ctor">
+            <summary>
+            Default constructor. Uses <see cref="P:System.Console.Out"/> as the output target.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.ActionBenchmarkInvoker">
+            <summary>
+                A <see cref="T:NBench.Sdk.IBenchmarkInvoker" /> implementation that works on anonymous methods and delegates.
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.ActionBenchmarkInvoker.NoOp">
+            <summary>
+                Default no-op action.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.EmptyAssertion">
+            <summary>
+            No-op <see cref="T:NBench.Sdk.Assertion"/>
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.Assertion">
+            <summary>
+            Executes an assertion against a given metric
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.Assertion.Empty">
+            <summary>
+            Empty assertion - used when in <see cref="F:NBench.TestMode.Measurement"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Assertion.Condition">
+            <summary>
+            The condition we're using to test against <see cref="P:NBench.Sdk.Assertion.Value"/>
+            and possibly <see cref="P:NBench.Sdk.Assertion.MaxValue"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Assertion.Value">
+            <summary>
+            The expected value we'll be testing against during <see cref="M:NBench.Sdk.Assertion.Test(System.Double)"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Assertion.MaxValue">
+            <summary>
+            Optional value used in <see cref="F:NBench.MustBe.Between"/> comparisons.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.AssertionType">
+            <summary>
+            Different types of BenchmarkAssertions we might use against metrics
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.AssertionType.Total">
+            <summary>
+            Test against the averages of totals
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.AssertionType.Throughput">
+            <summary>
+            Test against the totals per second
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.Benchmark">
+            <summary>
+                Executor class for running a single <see cref="T:NBench.PerfBenchmarkAttribute" />
+                Exposes the <see cref="T:NBench.BenchmarkContext" />, which allows developers to register custom
+                metrics and counters for the use of their personal benchmarks.
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.Benchmark.StopWatch">
+            <summary>
+                Stopwatch used by the <see cref="T:NBench.Sdk.Benchmark" />. Exposed only for testing purposes.
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.Benchmark._isWarmup">
+            <summary>
+                Indicates if we're in warm-up mode or not
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.#ctor(NBench.Sdk.BenchmarkSettings,NBench.Sdk.IBenchmarkInvoker,NBench.Reporting.IBenchmarkOutput)">
+            <summary>
+            Backwards-compatible constructor for NBench 0.1.6 and earlier.
+            </summary>
+            <param name="settings">The settings for this benchmark.</param>
+            <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
+            <param name="writer">The output target this benchmark will write to.</param>
+            <remarks>Uses the <see cref="T:NBench.Sdk.DefaultBenchmarkAssertionRunner"/> to assert benchmark data.</remarks>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.#ctor(NBench.Sdk.BenchmarkSettings,NBench.Sdk.IBenchmarkInvoker,NBench.Reporting.IBenchmarkOutput,NBench.Sdk.IBenchmarkAssertionRunner)">
+            <summary>
+            Backwards-compatible constructor for NBench 0.1.6 and earlier.
+            </summary>
+            <param name="settings">The settings for this benchmark.</param>
+            <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
+            <param name="writer">The output target this benchmark will write to.</param>
+            <param name="benchmarkAssertions">The assertion engine we'll use to perform BenchmarkAssertions against benchmarks.</param>
+        </member>
+        <member name="P:NBench.Sdk.Benchmark.AllAssertsPassed">
+            <summary>
+            Returns <c>true</c> if <see cref="M:NBench.Sdk.Benchmark.Finish"/> was called and all BenchmarkAssertions passed,
+            or if it was never called.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Benchmark.BenchmarkName">
+            <summary>
+            The name of this benchmark
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.WarmUp">
+            <summary>
+                Warmup phase
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.Allocate">
+            <summary>
+                Pre-allocate all of the objects we're going to need for this benchmark
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.PrepareForRun">
+            <summary>
+            Performs any final GC needed before we start a test run
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.PostRun">
+            <summary>
+                NOTE: We don't reset the <see cref="T:System.Diagnostics.Stopwatch" /> on purpose here, so we can
+                collect the value of it and use it for auto-tuning and reporting.
+                It'll be started at the beginning of the next run.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.PrintWarmupOrRun(System.Boolean)">
+            <summary>
+            Helper method for printing out the correct label to trace
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.Complete(System.Boolean)">
+            <summary>
+            Complete the current run
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.CompileResults">
+            <summary>
+            Compiles all of the completed <see cref="T:NBench.Metrics.BenchmarkRun"/>s into reports
+            </summary>
+            <returns>The full set of aggregate results</returns>
+        </member>
+        <member name="M:NBench.Sdk.Benchmark.Finish">
+            <summary>
+            Complete the benchmark
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.BenchmarkBuilder">
+            <summary>
+                Responsible for instrumenting all of the metrics
+                and producing the <see cref="T:NBench.BenchmarkContext" /> used inside each <see cref="T:NBench.Metrics.BenchmarkRun" />
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.BenchmarkBuilder.#ctor(NBench.Sdk.BenchmarkSettings)">
+            <summary>
+                Creates a new benchmark builder instance.
+            </summary>
+            <param name="settings">The settings compiled for this benchmark.</param>
+        </member>
+        <member name="M:NBench.Sdk.BenchmarkBuilder.NewRun(NBench.Sdk.WarmupData)">
+            <summary>
+                Generates a new <see cref="T:NBench.Metrics.BenchmarkRun" /> based on the provided settings, available system metrics,
+                and (optionally) the duration of the last run.
+            </summary>
+            <param name="warmupData">Data collected during warm-up</param>
+            <returns>A new <see cref="T:NBench.Metrics.BenchmarkRun" /> instance.</returns>
+        </member>
+        <member name="T:NBench.Sdk.BenchmarkConstants">
+            <summary>
+            Set of constants used for evaluating different types of benchmarks and default behavior
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.BenchmarkConstants.SamplingPrecisionTicks">
+            <summary>
+            For long-running tests, sample metrics at 10ms intervals
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.BenchmarkSettings">
+            <summary>
+                Settings for how a particular <see cref="T:NBench.Sdk.Benchmark" /> should be run and executed.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.TestMode">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.RunMode">
+            <summary>
+                The mode in which the performance test will be executed.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.ConcurrentMode">
+            <summary>
+            Indicates whether concurrency is enabled or not
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.TracingEnabled">
+            <summary>
+            Indicates whether tracing is enabled or not
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.NumberOfIterations">
+            <summary>
+                Number of times this test will be run
+            </summary>
+            <remarks>Defaults to 10</remarks>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.RunTime">
+            <summary>
+                Timeout the performance test and fail it if
+                any individual run exceeds this value.
+            </summary>
+            <remarks>Set to 0 to disable.</remarks>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.Measurements">
+            <summary>
+            All of the configured metrics for this <see cref="T:NBench.Sdk.Benchmark"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.DistinctMeasurements">
+            <summary>
+            If someone declares two measurements that measure the same thing, but carry different BenchmarkAssertions
+            then those settings will only show up once on this list, whereas they might appear twice on <see cref="P:NBench.Sdk.BenchmarkSettings.Measurements"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.CounterMeasurements">
+            <summary>
+            Counter settings, which require special treatment since they have to be injected
+            into <see cref="T:NBench.BenchmarkContext"/>. Derived from <see cref="P:NBench.Sdk.BenchmarkSettings.DistinctMeasurements"/>.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.Collectors">
+            <summary>
+            The table of collectors we're going to use to gather the metrics configured in <see cref="P:NBench.Sdk.BenchmarkSettings.Measurements"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.Trace">
+            <summary>
+            The <see cref="T:NBench.IBenchmarkTrace"/> implementation we will use for each <see cref="T:NBench.Metrics.BenchmarkRun"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.TotalTrackedMetrics">
+            <summary>
+                Total number of all metrics tracked in this benchmark
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.Description">
+            <summary>
+                A description of this performance benchmark, which will be written into the report.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.Skip">
+            <summary>
+                If populated, this benchmark will be skipped and the skip reason will be written into the report.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.BenchmarkSettings.SkipWarmups">
+            <summary>
+            Indicates whether or not we will skip warmups for our benchmarks
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.AssemblyRuntimeLoader">
+            <summary>
+            Utility class for loading assemblies with benchmarks at runtime
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.AssemblyRuntimeLoader.LoadAssembly(System.String,NBench.Reporting.IBenchmarkOutput)">
+            <summary>
+            Loads an assembly into the current AppDomain
+            </summary>
+            <param name="assemblyPath">The path to an assembly</param>
+            <param name="trace">Optional. Benchmark tracing system.</param>
+            <returns>An <see cref="T:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader"/> with a reference to the <see cref="T:System.Reflection.Assembly"/> at the specified location.</returns>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.AssemblyRuntimeLoader.WrapAssembly(System.Reflection.Assembly,NBench.Reporting.IBenchmarkOutput)">
+            <summary>
+            Loads an assembly into the current AppDomain
+            </summary>
+            <param name="assembly">An already-loaded assembly.</param>
+            <param name="trace">Optional. Benchmark tracing system.</param>
+            <returns>An <see cref="T:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader"/> with a reference to the <see cref="T:System.Reflection.Assembly"/> at the specified location.</returns>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader">
+            <inheritdoc />
+             <summary>
+             INTERNAL API.
+             Used to load and resolve assemblies as part of NBench test discovery and execution.
+             </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader.Assembly">
+            <summary>
+            The primary assembly we're loading.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader.AssemblyAndDependencies">
+            <summary>
+            Assemblies that <see cref="P:NBench.Sdk.Compiler.Assemblies.IAssemblyLoader.Assembly"/> depends upon
+            and its dependencies.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.Assemblies.AssemblyRuntimeLoader">
+            <inheritdoc />
+             <summary>
+             INTERNAL API.
+             Used to run .NET Framework assemblies.
+             </summary>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.IDiscovery">
+            <summary>
+            Compiler responsible for generating <see cref="T:NBench.Sdk.BenchmarkSettings"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.IDiscovery.Output">
+            <summary>
+            Output engine used to write discovery and processing results to the log
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.IDiscovery.BenchmarkAssertions">
+            <summary>
+            Engine used to perform BenchmarkAssertions against data collected from a <see cref="T:NBench.Sdk.Benchmark"/>
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.IDiscovery.FindBenchmarks(System.Reflection.Assembly)">
+            <summary>
+            Uses reflection on the target assembly to discover <see cref="T:NBench.PerfBenchmarkAttribute"/>
+            instances.
+            </summary>
+            <param name="targetAssembly">The assembly we're going to scan for benchmarks.</param>
+            <returns>A list of <see cref="T:NBench.Sdk.Benchmark"/>s we can run based on the classes found inside <paramref name="targetAssembly"/>.</returns>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.IDiscovery.FindBenchmarks(System.Type)">
+            <summary>
+            Uses reflection on the target assembly to discover <see cref="T:NBench.PerfBenchmarkAttribute"/>
+            instances.
+            </summary>
+            <param name="targetType">The type we're going to scan for benchmarks.</param>
+            <returns>A list of <see cref="T:NBench.Sdk.Benchmark"/>s we can run based on the classes found inside <paramref name="targetType"/>.</returns>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.ReflectionDiscovery">
+            <summary>
+                <see cref="T:NBench.Sdk.Compiler.IDiscovery" /> implementation built using reflection
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.Compiler.ReflectionDiscovery._measurementConfiguratorTypes">
+            <summary>
+            Cache of <see cref="T:NBench.MeasurementAttribute"/> types and their "best fitting" <see cref="T:NBench.Sdk.IMeasurementConfigurator"/> type
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.ReflectionDiscovery.GetConfiguratorTypeForMeasurement(System.Type,NBench.Sdk.Compiler.Assemblies.IAssemblyLoader)">
+            <summary>
+            Finds a matching <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/> type for a given type of <see cref="T:NBench.MeasurementAttribute"/>
+            </summary>
+            <param name="measurementType">A type of <see cref="T:NBench.MeasurementAttribute"/></param>
+            <param name="specificAssembly">
+                Optional parameter. If an <see cref="T:System.Reflection.Assembly"/> is provided, we limit our search 
+                for <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/> definitions to just that target assembly.
+            </param>
+            <returns>A corresponding <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/> type</returns>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.ReflectionDiscovery.GetConfiguratorForMeasurement(System.Type,NBench.Sdk.Compiler.Assemblies.IAssemblyLoader)">
+            <summary>
+            Creates a <see cref="T:NBench.Sdk.IMeasurementConfigurator"/> instance for the provided <see cref="T:NBench.MeasurementAttribute"/> type.
+            </summary>
+            <param name="measurementType">A type of <see cref="T:NBench.MeasurementAttribute"/></param>
+            <param name="specificAssembly">
+                Optional parameter. If an <see cref="T:System.Reflection.Assembly"/> is provided, we limit our search 
+                for <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/> definitions to just that target assembly.
+            </param>
+            <returns>
+                If a <see cref="T:NBench.Sdk.IMeasurementConfigurator"/> type match was found, this method will return a NEW instance of that.
+                If no match was found, we return a special case instance of <see cref="T:NBench.Sdk.MeasurementConfigurator.EmptyConfigurator"/>.
+            </returns>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.ReflectionDiscovery.ConfiguratorSupportsMeasurement(System.Type,System.Type,System.Boolean)">
+            <summary>
+            Determine if a given <see cref="T:NBench.Sdk.IMeasurementConfigurator"/> type is a match for a
+            <see cref="T:NBench.MeasurementAttribute"/> type.
+            </summary>
+            <param name="measurementType">A <see cref="T:NBench.MeasurementAttribute"/> type.</param>
+            <param name="expectedConfiguratorType">A <see cref="T:NBench.Sdk.IMeasurementConfigurator"/> type.</param>
+            <param name="exact">
+                If <c>true</c>, then this method will look for an exact 1:1 type match. 
+                If <c>false</c>, which is the default then this method will return <c>true</c>
+                when any applicable types are assignable from <paramref name="measurementType"/>.
+            </param>
+            <returns><c>true</c> if a match was found, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.ReflectionDiscovery.IsValidConfiguratorType(System.Type)">
+            <summary>
+            Check if a given <paramref name="configuratorType"/> is a valid implementation of <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/>.
+            </summary>
+            <param name="configuratorType">The <see cref="T:System.Type"/> we're going to test.</param>
+            <returns>true if <paramref name="configuratorType"/> implements <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/>, false otherwise.</returns>
+        </member>
+        <member name="F:NBench.Sdk.Compiler.ReflectionDiscovery.ReflectionOutput">
+            <summary>
+            WARNING: SHARED MUTABLE STATE BETWEEN REFLECTIONDISCOVERY INSTANCES
+            
+            Bit of a hack - used internally by <see cref="T:NBench.Sdk.Compiler.ReflectionDiscovery"/> for
+            logging compilation warnings, which are static methods.
+            
+            Writes to the console by default, but can be overridden through the constructor.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.Compiler.ReflectionDiscovery.ClassesWithPerformanceBenchmarks(System.Reflection.Assembly)">
+            <summary>
+                Finds all classes with at least one method decorated with a <see cref="T:NBench.PerfBenchmarkAttribute" />.
+                inside <paramref name="targetAssembly" />.
+            </summary>
+            <param name="targetAssembly">The assembly we're scanning for benchmarks.</param>
+            <returns>
+                A list of all applicable types that contain at least one method with a
+                <see cref="T:NBench.PerfBenchmarkAttribute" />.
+            </returns>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.BenchmarkClassMetadata">
+            <summary>
+                Metadata used to create a <see cref="T:NBench.Sdk.Benchmark" />
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.Compiler.BenchmarkMethodMetadata">
+            <summary>
+                Metadata used to indicate how a single method works
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.Compiler.BenchmarkMethodMetadata.Empty">
+            <summary>
+                Empty method that won't be called during a benchmark run
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.BenchmarkMethodMetadata.InvocationMethod">
+            <summary>
+                The method we'll invoke for cleanup / teardown
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.BenchmarkMethodMetadata.TakesBenchmarkContext">
+            <summary>
+                Does this method take <see cref="T:NBench.BenchmarkContext" />?
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.Compiler.BenchmarkMethodMetadata.Skip">
+            <summary>
+                Skip this method
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.DefaultBenchmarkAssertionRunner">
+            <summary>
+                Responsible for running <see cref="T:NBench.Sdk.Assertion" />s over <see cref="T:NBench.Reporting.BenchmarkResults" />.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.IBenchmarkAssertionRunner">
+            <summary>
+            Responsible for running <see cref="T:NBench.Sdk.Assertion" />s over <see cref="T:NBench.Reporting.BenchmarkResults" />.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.IBenchmarkAssertionRunner.RunAssertions(NBench.Sdk.BenchmarkSettings,NBench.Reporting.BenchmarkResults)">
+            <summary>
+            Based on the provided <see cref="T:NBench.Sdk.BenchmarkSettings"/> and the <see cref="T:NBench.Reporting.BenchmarkResults"/>
+            collected from running a <see cref="T:NBench.Sdk.Benchmark"/>, determine if all of the configured BenchmarkAssertions
+            pass or not.
+            </summary>
+            <param name="settings">The settings for this benchmark.</param>
+            <param name="results">The results from this benchmark.</param>
+            <returns>A set of individual <see cref="T:NBench.Sdk.AssertionResult"/> instances.</returns>
+        </member>
+        <member name="T:NBench.Sdk.IBenchmarkInvoker">
+            <summary>
+                Used to invoke the benchmark methods on the user-defined
+                objects that have methods marked with <see cref="T:NBench.PerfBenchmarkAttribute" />.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.IBenchmarkInvoker.InvokePerfSetup(System.Int64,NBench.BenchmarkContext)">
+            <summary>
+            Used for <see cref="F:NBench.RunMode.Throughput"/> scenarios
+            </summary>
+            <param name="runCount">The number of runs for which we'll execute this benchmark</param>
+            <param name="context">The context used for the run</param>
+        </member>
+        <member name="T:NBench.Sdk.IBenchmarkSetting">
+            <summary>
+            Interface for all individual benchmark settings
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.IMeasurementConfigurator`1">
+            <summary>
+            Interface used to configure <see cref="T:NBench.MeasurementAttribute"/>s implemented in both built-in NBench libraries
+            and external libraries.
+            </summary>
+            <typeparam name="T">The type of measurement supported by this configurator</typeparam>
+        </member>
+        <member name="M:NBench.Sdk.IMeasurementConfigurator`1.GetName(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Metrics.MetricName"/> implementation based on the provided <see cref="T:NBench.MeasurementAttribute"/> instance.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A <see cref="T:NBench.Metrics.MetricName"/> implementation corresponding to this metric.</returns>
+        </member>
+        <member name="M:NBench.Sdk.IMeasurementConfigurator`1.GetMetricsProvider(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation based on the provided <see cref="T:NBench.MeasurementAttribute"/> instance.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation corresponding to this metric.</returns>
+            <remarks>This object basically tells NBench how to gather the metrics associated with the <see cref="T:NBench.MeasurementAttribute"/></remarks>
+        </member>
+        <member name="M:NBench.Sdk.IMeasurementConfigurator`1.GetBenchmarkSettings(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation that will be used to tell the
+            <see cref="T:NBench.Sdk.Benchmark"/> class which <see cref="T:NBench.Sdk.Assertion"/>, if any, it should perform against the
+            <see cref="T:NBench.Collection.MetricCollector"/> data produced for this setting by the <see cref="M:NBench.Sdk.MeasurementConfigurator`1.GetMetricsProvider(NBench.MeasurementAttribute)"/> method
+            on this configurator.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>An <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation instance built specifically for <typeparamref name="T"/></returns>
+        </member>
+        <member name="T:NBench.Sdk.IMeasurementConfigurator">
+            <summary>
+            Non-generic implementation of <see cref="T:NBench.Sdk.IMeasurementConfigurator"/>.
+            
+            INTERNAL USE ONLY. Must implement <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/> for NBench <see cref="T:NBench.Sdk.Compiler.ReflectionDiscovery"/>
+            to pick up your metrics.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.IMeasurementConfigurator.MeasurementType">
+            <summary>
+            The type of the underlying <see cref="T:NBench.MeasurementAttribute"/> configured by this <see cref="T:NBench.Sdk.MeasurementConfigurator`1"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.IMeasurementConfigurator.MeasurementTypeInfo">
+            <summary>
+            <see cref="T:System.Reflection.TypeInfo"/> extracted from <see cref="P:NBench.Sdk.IMeasurementConfigurator.MeasurementType"/>; cached to save on frequent lookups.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.IMeasurementConfigurator.GetMetricsProvider(NBench.MeasurementAttribute)">
+            <summary>
+            Produce a <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation based on the provided <see cref="T:NBench.MeasurementAttribute"/> instance.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation corresponding to this metric.</returns>
+            <remarks>This object basically tells NBench how to gather the metrics associated with the <see cref="T:NBench.MeasurementAttribute"/></remarks>
+        </member>
+        <member name="M:NBench.Sdk.IMeasurementConfigurator.GetBenchmarkSettings(NBench.MeasurementAttribute)">
+            <summary>
+            Produce a <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation that will be used to tell the
+            <see cref="T:NBench.Sdk.Benchmark"/> class which <see cref="T:NBench.Sdk.Assertion"/>, if any, it should perform against the
+            <see cref="T:NBench.Collection.MetricCollector"/> data produced for this setting by the <see cref="M:NBench.Sdk.MeasurementConfigurator`1.GetMetricsProvider(NBench.MeasurementAttribute)"/> method
+            on this configurator.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A list of <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation instances built specifically for <paramref name="instance"/></returns>
+        </member>
+        <member name="T:NBench.Sdk.MeasurementConfigurator">
+            <summary>
+            Static utility class for <see cref="T:NBench.Sdk.IMeasurementConfigurator`1"/>
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.MeasurementConfigurator.EmptyConfigurator">
+            <summary>
+            Special case type when we can't find a matching configurator
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.MeasurementConfigurator.EmptyConfiguratorType">
+            <summary>
+            <see cref="T:System.Type"/> data for <see cref="T:NBench.Sdk.MeasurementConfigurator.EmptyConfigurator"/>
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.MeasurementConfigurator.IsValidConfigurator(System.Type)">
+            <summary>
+            Returns <c>true</c> if the given type implements <see cref="T:NBench.Sdk.IMeasurementConfigurator"/>
+            </summary>
+            <param name="configuratorType">The type we're testing.</param>
+            <returns>True if it's a valid <see cref="T:NBench.Sdk.IMeasurementConfigurator"/>, false otherwise.</returns>
+        </member>
+        <member name="T:NBench.Sdk.MeasurementConfigurator`1">
+            <summary>
+            Used by <see cref="T:NBench.Sdk.Compiler.ReflectionDiscovery"/> to provide all of the necessary
+            components needed to create usable settings needed to instrument developer-defined
+            <see cref="T:NBench.MeasurementAttribute"/>s.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:NBench.MeasurementAttribute"/> configured by this class.</typeparam>
+        </member>
+        <member name="P:NBench.Sdk.MeasurementConfigurator`1.MeasurementType">
+            <summary>
+            The type of the underlying <see cref="T:NBench.MeasurementAttribute"/> configured by this <see cref="T:NBench.Sdk.MeasurementConfigurator`1"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.MeasurementConfigurator`1.MeasurementTypeInfo">
+            <summary>
+            <see cref="T:System.Reflection.TypeInfo"/> extracted from <see cref="P:NBench.Sdk.MeasurementConfigurator`1.MeasurementType"/>; cached to save on frequent lookups.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.MeasurementConfigurator`1.GetName(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Metrics.MetricName"/> implementation based on the provided <see cref="T:NBench.MeasurementAttribute"/> instance.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A <see cref="T:NBench.Metrics.MetricName"/> implementation corresponding to this metric.</returns>
+        </member>
+        <member name="M:NBench.Sdk.MeasurementConfigurator`1.GetMetricsProvider(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation based on the provided <see cref="T:NBench.MeasurementAttribute"/> instance.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns>A <see cref="T:NBench.Collection.MetricsCollectorSelector"/> implementation corresponding to this metric.</returns>
+            <remarks>This object basically tells NBench how to gather the metrics associated with the <see cref="T:NBench.MeasurementAttribute"/></remarks>
+        </member>
+        <member name="M:NBench.Sdk.MeasurementConfigurator`1.GetBenchmarkSettings(`0)">
+            <summary>
+            Produce a <see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation that will be used to tell the
+            <see cref="T:NBench.Sdk.Benchmark"/> class which <see cref="T:NBench.Sdk.Assertion"/>, if any, it should perform against the
+            <see cref="T:NBench.Collection.MetricCollector"/> data produced for this setting by the <see cref="M:NBench.Sdk.MeasurementConfigurator`1.GetMetricsProvider(NBench.MeasurementAttribute)"/> method
+            on this configurator.
+            </summary>
+            <param name="instance">
+            An instance of the <see cref="T:NBench.MeasurementAttribute"/> type that corresponds to this configurator. 
+            Must not be <c>null</c>.
+            </param>
+            <returns><see cref="T:NBench.Sdk.IBenchmarkSetting"/> implementation instances built specifically for T</returns>
+        </member>
+        <member name="T:NBench.Sdk.ReflectionBenchmarkInvoker">
+            <summary>
+                <see cref="T:NBench.Sdk.IBenchmarkInvoker" /> implementaton that uses reflection to invoke setup / run / cleanup methods
+                found on classes decorated with the appropriate <see cref="T:NBench.PerfBenchmarkAttribute" />s.
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.RunnerSettings">
+            <summary>
+            NBench settings passed into the <see cref="T:NBench.Sdk.TestRunner"/>, usually via end-user commandline.
+            
+            This class is used to memoize NBench settings and record them in the benchmark output.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.RunnerSettings.ConcurrentModeEnabled">
+            <summary>
+            Indicates if we're running in concurrent mode or not.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.RunnerSettings.TracingEnabled">
+            <summary>
+            Indicates if tracing is enabled or not
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.TestPackage">
+            <summary>
+            A TestPackage contains one or more test files. It also holds settings how the tests should be loaded. 
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.TestPackage._include">
+            <summary>
+            List of patterns to be included in the tests. Wildchars supported (*, ?)
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.TestPackage._exclude">
+            <summary>
+            List of patterns to be excluded from the tests. Wildchars supported (*, ?)
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.ConfigurationFile">
+            <summary>
+            Gets or sets a file path to the configuration file (app.config) used for the test assemblies
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.OutputDirectory">
+            <summary>
+            Gets or sets the directory for the result output file
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.Name">
+            <summary>
+            Gets or sets the name of the test package
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.Concurrent">
+            <summary>
+            If <c>true</c>, NBench disables any processor affinity or thread priority settings.
+            If <c>false</c>, NBench will run in single-threaded mode and set processor affinity + thread priority.
+            
+            Defaults to false.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.TestAssemblies">
+            <summary>
+            Gets the assemblies containing tests
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.Tracing">
+            <summary>
+            If <c>true</c>, NBench enables tracing and writes its output to all configured output targets.
+            If <c>false</c>, NBench disables tracing and will not write any output.
+            
+            Defaults to false.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.TeamCity">
+            <summary>
+            If <c>true</c>, NBench uses TeamCity formatting for all of its benchmark methods.
+            If <c>false</c>, NBench uses regular console logging for all of its benchmark methods.
+            
+            Defaults to false.
+            </summary>
+        </member>
+        <member name="P:NBench.Sdk.TestPackage.OutputTargets">
+            <summary>
+            Additional output targets that will be written to in addition to <see cref="T:NBench.Reporting.Targets.MarkdownBenchmarkOutput"/>
+            and <see cref="T:NBench.Reporting.Targets.ConsoleBenchmarkOutput"/>.
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.TestPackage.#ctor(System.Reflection.Assembly,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Initializes a new test package with one test assembly.
+            </summary>
+            <param name="testAssembly">An assembly to test.</param>
+            <param name="include">An optional include pattern</param>
+            <param name="exclude">An optional exclude pattern</param>
+            <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="P:NBench.Sdk.TestPackage.Concurrent"/> for more details.</param>
+        </member>
+        <member name="M:NBench.Sdk.TestPackage.#ctor(System.Collections.Generic.IEnumerable{System.Reflection.Assembly},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Initializes a new package with multiple test files.
+            </summary>
+            <param name="assemblies">A list of test files.</param>
+            <param name="include">Optional list of include patterns</param>
+            <param name="exclude">Optional list of exclude patterns</param>
+            <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="P:NBench.Sdk.TestPackage.Concurrent"/> for more details.</param>
+        </member>
+        <member name="M:NBench.Sdk.TestPackage.AddExclude(System.String)">
+            <summary>
+            Add a pattern to be excluded. We'll ignore nulls.
+            </summary>
+            <param name="exclude"></param>
+        </member>
+        <member name="M:NBench.Sdk.TestPackage.AddInclude(System.String)">
+            <summary>
+            Add a pattern to be included. We'll ignore nulls.
+            </summary>
+            <param name="include"></param>
+        </member>
+        <member name="M:NBench.Sdk.TestPackage.BuildPattern(System.String)">
+            <summary>
+            Converts a wildcard to a regex pattern
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.TestRunnerResult">
+            <summary>
+            Results collected by the test runner
+            </summary>
+        </member>
+        <member name="T:NBench.Sdk.TestRunner">
+            <summary>
+            Executor of tests
+            </summary>
+            <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
+        </member>
+        <member name="F:NBench.Sdk.TestRunner.IsMono">
+            <summary>
+            Can't apply some of our optimization tricks if running Mono, due to need for elevated permissions
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.TestRunner.#ctor(NBench.Sdk.TestPackage)">
+            <summary>
+            Initializes a new instance of the test runner.
+            </summary>
+            <param name="package">The test package to be executed</param>
+        </member>
+        <member name="M:NBench.Sdk.TestRunner.Run(NBench.Sdk.TestPackage)">
+            <summary>
+            Executes the test package.
+            </summary>
+            <param name="package">The test package to execute.</param>
+            <remarks>Creates a new instance of <see cref="T:NBench.Sdk.TestRunner"/> and executes the tests.</remarks>
+        </member>
+        <member name="M:NBench.Sdk.TestRunner.SetProcessPriority(System.Boolean)">
+            <summary>
+            Initializes the process and thread
+            </summary>
+        </member>
+        <member name="M:NBench.Sdk.TestRunner.Execute">
+            <summary>
+            Executes the tests
+            </summary>
+            <returns>True if all tests passed.</returns>
+        </member>
+        <member name="M:NBench.Sdk.TestRunner.CreateOutput">
+            <summary>
+            Creates the benchmark output writer
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:NBench.Sdk.WarmupData">
+            <summary>
+            Used when estimating the size of the next run.
+            
+            Designed to help buffer NBench from influencing any benchmarks itself.
+            </summary>
+        </member>
+        <member name="F:NBench.Sdk.WarmupData.PreWarmupSampleSize">
+            <summary>
+            The default sample size we use during JIT warmups
+            </summary>
+        </member>
+        <member name="T:NBench.Sys.SysInfo">
+            <summary>
+            Class that contains some basic information about the runtime environment
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.OS">
+            <summary>
+            Current version of the OS
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.ClrVersion">
+            <summary>
+            Current version of the CLR
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.ProcessorCount">
+            <summary>
+            Number of logical processors
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.WorkerThreads">
+            <summary>
+            Number of worker threads in <see cref="T:System.Threading.ThreadPool"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.IOThreads">
+            <summary>
+            Number of I/O completion port threads in <see cref="T:System.Threading.ThreadPool"/>
+            </summary>
+        </member>
+        <member name="P:NBench.Sys.SysInfo.MaxGcGeneration">
+            <summary>
+            Maximum number of GC generations
+            </summary>
+            <remarks>
+            If this system allows Gen 0, Gen 1, an Gen 2 GC then this value will be 2.
+            If this system allows Gen 0, Gen 1, Gen 2, and Gen 3 then this value will be 3.
+            </remarks>
+        </member>
+        <member name="F:NBench.Sys.SysInfo.Instance">
+            <summary>
+            Singleton instance of <see cref="T:NBench.Sys.SysInfo"/>
+            </summary>
+        </member>
+        <member name="T:NBench.TimingMeasurementAttribute">
+            <summary>
+            Used to measure and assert how much time elapses while executing a block of code.
+            
+            Typically designed for work with <see cref="F:NBench.RunMode.Iterations"/> benchmarks 
+            that are longer-running (can be measured in whole milliseconds.)
+            </summary>
+        </member>
+        <member name="T:NBench.ElapsedTimeAssertionAttribute">
+            <summary>
+            Takes data from a <see cref="T:NBench.TimingMeasurementAttribute"/> and performs an assertion
+            on it basedon <see cref="P:NBench.ElapsedTimeAssertionAttribute.MaxTimeMilliseconds"/> and <see cref="P:NBench.ElapsedTimeAssertionAttribute.MinTimeMilliseconds"/> (the latter is optional.)
+            </summary>
+        </member>
+        <member name="P:NBench.ElapsedTimeAssertionAttribute.MaxTimeMilliseconds">
+            <summary>
+            The maximum amount of time allowed to elapse for this <see cref="T:NBench.PerfBenchmarkAttribute"/> in MILLISECONDS
+            </summary>
+        </member>
+        <member name="P:NBench.ElapsedTimeAssertionAttribute.MinTimeMilliseconds">
+            <summary>
+            OPTIONAL. The minimum amount of time that must elapsed for this <see cref="T:NBench.PerfBenchmarkAttribute"/> in MILLISECONDs
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.BenchmarkOutputTrace">
+            <summary>
+            An <see cref="T:NBench.IBenchmarkTrace"/> implementation which creates <see cref="T:NBench.Tracing.TraceMessage"/>s
+            and immediately writes them to the <see cref="T:NBench.Reporting.IBenchmarkOutput"/> implementation used for this spec.
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.NoOpBenchmarkTrace">
+            <inheritdoc />
+            <summary>
+            Default no-op implementation of <see cref="T:NBench.IBenchmarkTrace" />. Does nothing.
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.TraceMessage">
+            <summary>
+                An event instance produced by a <see cref="T:NBench.IBenchmarkTrace" />
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.Info">
+            <summary>
+                <see cref="T:NBench.Tracing.Info" /> events
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.Debug">
+            <summary>
+                <see cref="T:NBench.Tracing.Debug" /> events
+            </summary>
+        </member>
+        <member name="T:NBench.Tracing.TraceLevel">
+            <summary>
+            Represents the level of the trace used inside NBench
+            </summary>
+        </member>
+        <member name="T:NBench.Util.AtomicCounter">
+            <summary>
+            Atomic counter class used for incrementing and decrementing <c>long</c> integer values.
+            </summary>
+        </member>
+    </members>
+</doc>
